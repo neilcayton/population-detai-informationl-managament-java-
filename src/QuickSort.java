@@ -1,31 +1,29 @@
 package src;
 
-import java.util.Collection;
 import java.util.List;
 
 class QuickSortStrings{
 
-
-    public void quickSortStrings(List<String> strings, int lowIndex, int highIndex, boolean ascendingOrder) {
+    public void quickSortStrings(List<Citizen> strings, int lowIndex, int highIndex, String val, boolean ascendingOrder) {
         if (lowIndex >= highIndex) {
             return;
         }
 
-        int pivotIndex = partition(strings, lowIndex, highIndex, ascendingOrder);
-        quickSortStrings(strings, lowIndex, pivotIndex - 1, ascendingOrder);
-        quickSortStrings(strings, pivotIndex + 1, highIndex, ascendingOrder);
+        int pivotIndex = partition(strings, lowIndex, highIndex, val, ascendingOrder);
+        quickSortStrings(strings, lowIndex, pivotIndex - 1, val, ascendingOrder);
+        quickSortStrings(strings, pivotIndex + 1, highIndex, val, ascendingOrder);
     }
 
-    private int partition(List<String> strings, int lowIndex, int highIndex, boolean ascendingOrder) {
-        String pivot = strings.get(highIndex);
+    private int partition(List<Citizen> strings, int lowIndex, int highIndex, String val, boolean ascendingOrder) {
+        String pivot = strings.get(highIndex).getValue(val).toString();
         int leftPointer = lowIndex;
         int rightPointer = highIndex - 1;
 
         while (leftPointer <= rightPointer) {
-            while (compare(strings.get(leftPointer), pivot, ascendingOrder) < 0 && leftPointer <= rightPointer) {
+            while (compare(strings.get(leftPointer).getValue(val).toString(), pivot, ascendingOrder) < 0 && leftPointer <= rightPointer) {
                 leftPointer++;
             }
-            while (compare(strings.get(rightPointer), pivot, ascendingOrder) > 0 && leftPointer <= rightPointer) {
+            while (compare(strings.get(rightPointer).getValue(val).toString(), pivot, ascendingOrder) > 0 && leftPointer <= rightPointer) {
                 rightPointer--;
             }
             if (leftPointer <= rightPointer) {
@@ -39,8 +37,8 @@ class QuickSortStrings{
         return leftPointer;
     }
 
-    private void swap(List<String> strings, int index1, int index2) {
-        String temp = strings.get(index1);
+    private void swap(List<Citizen> strings, int index1, int index2) {
+        Citizen temp = strings.get(index1);
         strings.set(index1, strings.get(index2));
         strings.set(index2, temp);
     }
@@ -60,25 +58,50 @@ class QuickSortNums {
         if (lowIndex >= highIndex) {
             return;
         }
+        boolean condition = val.equals("age") || val.equals("district");
+        ;
 
-        int pivot = Integer.parseInt((String) citizens.get(highIndex).getValue(val)); // parse the string to integer
+        int pivot = 0;
+        if (condition) {
+            pivot = (Integer) citizens.get(highIndex).getValue(val);
+        } else {
+            pivot = Integer.parseInt((String) citizens.get(highIndex).getValue(val)); // parse the string to integer
+        }
         int leftPointer = lowIndex;
         int rightPointer = highIndex;
 
         while (leftPointer < rightPointer) {
             if (ascending) {
-                while (Integer.parseInt((String) citizens.get(leftPointer).getValue(val)) < pivot && leftPointer < rightPointer) { // parse the string to integer for comparison
-                    leftPointer++;
-                }
-                while (Integer.parseInt((String) citizens.get(rightPointer).getValue(val)) >= pivot && leftPointer < rightPointer) { // parse the string to integer for comparison
-                    rightPointer--;
+                if (condition) {
+                    while ((Integer) citizens.get(leftPointer).getValue(val) < pivot && leftPointer < rightPointer) {
+                        leftPointer++;
+                    }
+                    while ((Integer) citizens.get(rightPointer).getValue(val) >= pivot && leftPointer < rightPointer) {
+                        rightPointer--;
+                    }
+                } else {
+                    while (Integer.parseInt((String) citizens.get(leftPointer).getValue(val)) < pivot && leftPointer < rightPointer) { // parse the string to integer for comparison
+                        leftPointer++;
+                    }
+                    while (Integer.parseInt((String) citizens.get(rightPointer).getValue(val)) >= pivot && leftPointer < rightPointer) { // parse the string to integer for comparison
+                        rightPointer--;
+                    }
                 }
             } else {
-                while (Integer.parseInt((String) citizens.get(leftPointer).getValue(val)) > pivot && leftPointer < rightPointer) { // parse the string to integer for comparison
-                    leftPointer++;
-                }
-                while (Integer.parseInt((String) citizens.get(rightPointer).getValue(val)) <= pivot && leftPointer < rightPointer) { // parse the string to integer for comparison
-                    rightPointer--;
+                if (condition) {
+                    while ((Integer) citizens.get(leftPointer).getValue(val) > pivot && leftPointer < rightPointer) {
+                        leftPointer++;
+                    }
+                    while ((Integer) citizens.get(rightPointer).getValue(val) <= pivot && leftPointer < rightPointer) {
+                        rightPointer--;
+                    }
+                } else {
+                    while (Integer.parseInt((String) citizens.get(leftPointer).getValue(val)) > pivot && leftPointer < rightPointer) { // parse the string to integer for comparison
+                        leftPointer++;
+                    }
+                    while (Integer.parseInt((String) citizens.get(rightPointer).getValue(val)) <= pivot && leftPointer < rightPointer) { // parse the string to integer for comparison
+                        rightPointer--;
+                    }
                 }
             }
             swap(citizens, leftPointer, rightPointer);

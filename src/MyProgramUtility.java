@@ -32,10 +32,10 @@ public class MyProgramUtility {
                 System.out.print("\n Enter choice: ");
                 choice = Integer.parseInt(scanner.nextLine().trim());
 
-                if (choice >= 1 && choice <= 5) {
+                if (choice >= 1 && choice <= 7) {
                     isValid = true;
                 } else {
-                    System.out.print("The number must be from 1 to 5. Please enter again: ");
+                    System.out.print("The number must be from 1 to 7. Please enter again: ");
                 }
             } catch (NumberFormatException e) {
                 System.out.print("You entered an invalid integer. Please enter integer: ");
@@ -84,53 +84,118 @@ public class MyProgramUtility {
                 1. Show district by choice
                 2. Show gender distribution
                 3. Sort the citizens list
-                4. Exit""");
+                4. Top Name List
+                5. Show age by choice
+                6. specific finder
+                7. exit""");
+
+
+
+    }
+
+    public void printSpecificFinderMenu(){
+        System.out.println("""
+                Please select an option:
+
+                1. Show district by choice
+                2. Show age by choice
+                3. Show gender
+                4. Show name
+                5. Top Name List
+                6. exit""");
 
 
 
     }
 
     public boolean sortOrder(){
-        System.out.print("" +
-                "Type A for Ascending order\n" +
-                "Type D for Descending order\n" +
-                "\nType Here: ");
+        System.out.print("Type A for Ascending order\nType D for Descending order\n\nType Here: ");
         String order = scanner.nextLine();
     return (order.equalsIgnoreCase("a"));
+    }
+    public boolean OptionFullname(){
+        System.out.print("Type F to see top First names\nType L to see top Last names\n\nType Here: ");
+        String order = scanner.nextLine();
+        return (order.equalsIgnoreCase("f"));
+    }
+    public int TopListFullname(){
+        System.out.print("\nAssign number of top name list: ");
+        return Integer.parseInt(scanner.nextLine());
     }
 
     public void toSort(List<Citizen> citizens){
         boolean sort;
         SortingMethods chosenSort = new SortingMethods();
-        int choice = 0;
-        while (choice!=7){
+        int choice;
+
             printSortingMenu();
-            sort = sortOrder();
             choice = readSortingChoice();
+            sort = sortOrder();
             switch (choice) {
-                case 1 -> System.out.println();
+                case 1 -> printData(chosenSort.SortNames(citizens,sort));
                 case 2 -> printData(chosenSort.SortAge(citizens,sort));
-                case 3 -> toSort(citizens);
-                case 4 -> System.out.println("Exiting program...");
-                case 7 -> System.out.println("going back");
+                case 3 -> System.out.println("Exiting program...");
+                case 4-> System.out.println("going back");
                 default -> System.out.println("Invalid choice. Please try again.");
-            }
+
         }
 
     }
     public void run(){
-        MyProgramUtility start = new MyProgramUtility();
+        SortingMethods sortingMethods = new SortingMethods();
         int choice = 0;
         try {
             ArrayList<Citizen> citizens = (ArrayList<Citizen>)  readDataFromCSV();
-            while (choice!=5){
+            listOfCitizens = citizens;
+            while (choice!=7){
                 printMainMenu();
                 choice = readChoice();
                 switch (choice) {
-                    case 1 ->  start.printData(returnDistrict(citizens));
-                    case 2 -> start.genderDistribution(citizens);
+                    case 1 -> printData(returnDistrict(listOfCitizens));
+                    case 2 -> genderDistribution(citizens);
                     case 3 -> toSort(citizens);
-                    case 4 -> System.out.println("Exiting program...");
+                    case 4 -> printData(sortingMethods.getTopRecurringNames(citizens,OptionFullname(),TopListFullname()));
+                    case 5 -> printData(returnAge(listOfCitizens));
+                    case 6 -> specificFinder(citizens,sortingMethods);
+                    case 7 -> System.out.println("Exiting program...");
+                    default -> System.out.println("Invalid choice. Please try again.");
+                }
+
+            }
+
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void specificFinder(List<Citizen> citizens, SortingMethods sortingMethods){
+        int choice = 0;
+        try {
+            listOfCitizens = citizens;
+            while (choice!=6){
+                printSpecificFinderMenu();
+                choice = readChoice();
+                switch (choice) {
+                    case 1 -> {
+                        listOfCitizens = returnDistrict(listOfCitizens);
+                        printData(listOfCitizens);
+                    }
+
+                    case 2 -> {
+                        listOfCitizens = returnAge(listOfCitizens);
+                        printData(listOfCitizens);
+                    }
+                    case 3 -> {
+                        listOfCitizens = returnGender(listOfCitizens);
+                        printData(listOfCitizens);
+                    }
+                    case 4 -> {
+                        listOfCitizens = returnNameSpecifiedSearch(listOfCitizens);
+                        printData(listOfCitizens);
+                    }
+                    case 5 -> printData(sortingMethods.getTopRecurringNames(citizens,OptionFullname(),TopListFullname()));
+                    case 6 -> System.out.println("Exiting program...");
                     default -> System.out.println("Invalid choice. Please try again.");
                 }
 
@@ -165,7 +230,7 @@ public class MyProgramUtility {
         List<Citizen> citizensList = new ArrayList<>();
 
         File file = readFile("data.csv");
-        BufferedReader reader= null;
+        BufferedReader reader;
         String line;
 
         try {
@@ -190,6 +255,19 @@ public class MyProgramUtility {
     return citizensList;
     }
 
+    public List<Citizen> returnAge(List<Citizen> citizens){
+        List<Citizen> newCitizen = new ArrayList<>();
+        System.out.print("Age that you want to see: ");
+        int age = scanner.nextInt();
+        Predicate<Citizen> predicate = citizen -> citizen.age == age;
+        Function<Citizen, Citizen> function= o -> {
+            if(predicate.test(o)) newCitizen.add(o);
+            return o;
+        };
+        citizens.stream().map(function).collect(Collectors.toList());
+        return newCitizen;
+    }
+
     public List<Citizen> returnDistrict(List<Citizen> citizens){
         List<Citizen> newCitizen = new ArrayList<>();
         System.out.print("District that you want to see: ");
@@ -203,6 +281,44 @@ public class MyProgramUtility {
         return newCitizen;
     }
 
+    public List<Citizen> returnNameSpecifiedSearch(List<Citizen> citizens){
+        System.out.print("Enter Name: ");
+
+        String input = scanner.nextLine();
+
+        return citizens.stream()
+                .filter(citizen -> hasDuplicateString(input, citizen.getFullname()))
+                .collect(Collectors.toList());
+    }
+    public boolean hasDuplicateString(String input, String str) {
+        String[] nameParts = str.split("\\s+"); // split the name into parts using whitespace
+        for (String part : nameParts) {
+            if (input.equalsIgnoreCase(part)) { // check if the input matches any of the parts
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public List<Citizen> returnGender(List<Citizen> citizens){
+
+        boolean isValid = true;
+        String input;
+        do {
+            System.out.print("Enter Gender [M(male)/F(female)]: ");
+            input = scanner.nextLine().toLowerCase();
+            if (input.equals("m") || input.equals("f")) {
+                isValid = false;
+            } else {
+                System.out.println("Invalid input. Please enter either 'M' or 'F'.");
+            }
+        } while (isValid);
+
+        String finalInput = input.toUpperCase();
+        return citizens.stream()
+                .filter(citizen -> citizen.getGender() == finalInput.charAt(0)).collect(Collectors.toList());
+    }
+
     public void genderDistribution(List<Citizen> citizens){
         int Male = 0;
         int Female = 0;
@@ -214,7 +330,7 @@ public class MyProgramUtility {
             if (isMale.test(citizen)){
                 Male++;
             }else Female++;
-        };
+        }
 
         System.out.println("Male: " + Male);
         System.out.println("Female: " + Female);
