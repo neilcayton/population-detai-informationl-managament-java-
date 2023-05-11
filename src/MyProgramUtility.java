@@ -21,29 +21,33 @@ public class MyProgramUtility {
         newDat.run();
     }
 
-
-
-
-    public int readChoice(){
+    public int readChoice() {
         int choice = 0;
         boolean isValid = false;
         while (!isValid) {
+            System.out.print("\nEnter choice: ");
             try {
-                System.out.print("\n Enter choice: ");
-                choice = Integer.parseInt(scanner.nextLine().trim());
 
+                String input = scanner.nextLine().trim();
+
+                if (input.isEmpty()) {
+                    System.out.println("Please enter a number.");
+                    continue;
+                }
+                choice = Integer.parseInt(input);
                 if (choice >= 1 && choice <= 7) {
                     isValid = true;
                 } else {
                     System.out.print("The number must be from 1 to 7. Please enter again: ");
                 }
             } catch (NumberFormatException e) {
-                System.out.print("You entered an invalid integer. Please enter integer: ");
+                System.out.println("You entered an invalid integer. Please enter integer: ");
             }
         }
         return choice;
-
     }
+
+
     public int readSortingChoice(){
         int choice = 0;
         boolean isValid = false;
@@ -74,7 +78,6 @@ public class MyProgramUtility {
                 4. Sort by address
                 5. Sort by email
                 6. Sort by resident status
-                7. Sort by registration date
                 """);
     }
     public void printMainMenu(){
@@ -94,7 +97,7 @@ public class MyProgramUtility {
     }
 
     public void printSpecificFinderMenu(){
-        System.out.println("""
+        System.out.println("\n\n"+"""
                 Please select an option:
 
                 1. Show district by choice
@@ -130,12 +133,19 @@ public class MyProgramUtility {
 
             printSortingMenu();
             choice = readSortingChoice();
-            sort = sortOrder();
+
             switch (choice) {
-                case 1 -> printData(chosenSort.SortNames(citizens,sort));
-                case 2 -> printData(chosenSort.SortAge(citizens,sort));
-                case 3 -> System.out.println("Exiting program...");
-                case 4-> System.out.println("going back");
+                case 1 -> {sort = sortOrder();
+                    printData(chosenSort.sortNames(citizens,sort));}
+                case 2 -> printData(returnGender(citizens));
+                case 3 -> {sort = sortOrder();
+                    printData(chosenSort.SortAge(citizens,sort));}
+                case 4-> {sort = sortOrder();
+                    printData(chosenSort.sortEmail(citizens,sort));}
+                case 5-> {sort = sortOrder();
+                    printData(chosenSort.sortAddress(citizens,sort));}
+                case 6 -> printData(returnResident(citizens));
+
                 default -> System.out.println("Invalid choice. Please try again.");
 
         }
@@ -146,18 +156,18 @@ public class MyProgramUtility {
         int choice = 0;
         try {
             ArrayList<Citizen> citizens = (ArrayList<Citizen>)  readDataFromCSV();
-            listOfCitizens = citizens;
+
             while (choice!=7){
                 printMainMenu();
                 choice = readChoice();
                 switch (choice) {
-                    case 1 -> printData(returnDistrict(listOfCitizens));
+                    case 1 -> printData(returnDistrict(citizens));
                     case 2 -> genderDistribution(citizens);
                     case 3 -> toSort(citizens);
                     case 4 -> printData(sortingMethods.getTopRecurringNames(citizens,optionFullName(),topListFullName()));
-                    case 5 -> printData(returnAge(listOfCitizens));
+                    case 5 -> printData(returnAge(citizens));
                     case 6 -> specificFinder(citizens,sortingMethods);
-                    case 7 -> System.out.println("Exiting program...");
+                    case 7 -> System.out.println("Going back to main menu...");
                     default -> System.out.println("Invalid choice. Please try again.");
                 }
 
@@ -300,6 +310,31 @@ public class MyProgramUtility {
         return false;
     }
 
+    public List<Citizen> returnResident(List<Citizen> citizens){
+        boolean condition;
+        boolean isValid = true;
+        String input;
+        do {
+            System.out.print("Enter  [N(Non-resident)/R(Resident)]: ");
+            input = scanner.nextLine().toLowerCase();
+            if (input.equals("n") || input.equals("y")) {
+                if(input.equals("n")){
+                    condition = false;
+                }
+                {
+                    condition = true;
+                }
+                isValid = false;
+            } else {
+                System.out.println("Invalid input. Please enter either 'N' or 'Y'.");
+            }
+        } while (isValid);
+
+
+        boolean finalCondition = true;
+        return citizens.stream()
+                .filter(citizen -> finalCondition == citizen.resident).collect(Collectors.toList());
+    }
     public List<Citizen> returnGender(List<Citizen> citizens){
 
         boolean isValid = true;

@@ -5,11 +5,23 @@ import java.util.*;
 public class SortingMethods {
 
 
-    public List<Citizen> SortNames(List<Citizen> citizen, boolean sortOrder){
+    public List<Citizen> sortNames(List<Citizen> citizen, boolean sortOrder){
         QuickSortStrings proceed = new QuickSortStrings();
         proceed.quickSortStrings(citizen,0,citizen.size() -2,"fullname",sortOrder);
         return citizen;
     }
+    public List<Citizen> sortEmail(List<Citizen> citizen, boolean sortOrder){
+        QuickSortStrings proceed = new QuickSortStrings();
+        proceed.quickSortStrings(citizen,0,citizen.size() -2,"email",sortOrder);
+        return citizen;
+    }
+
+    public List<Citizen> sortAddress(List<Citizen> citizen, boolean sortOrder){
+        QuickSortStrings proceed = new QuickSortStrings();
+        proceed.quickSortStrings(citizen,0,citizen.size() -2,"address",sortOrder);
+        return citizen;
+    }
+
 
     public List<Citizen> SortAge(List<Citizen> citizen, boolean sortOrder){
         QuickSortNums proceed =  new QuickSortNums();
@@ -25,8 +37,12 @@ public class SortingMethods {
 
         // Count the occurrences of each name and store them in a HashMap
         for (Citizen citizen : citizens) {
-            String[] name = citizen.getFullname().split(",");
-            int count = nameCountMap.getOrDefault(name[main_focus_index], 0);
+            String[] name = citizen.getFullname().split("\\s+");
+            if (name.length <= main_focus_index) {
+                continue; // skip this Citizen object
+            }
+            int count;
+            count = nameCountMap.getOrDefault(name[main_focus_index], 0);
             nameCountMap.put(name[main_focus_index], count + 1);
         }
 
@@ -47,7 +63,7 @@ public class SortingMethods {
 
         // Find the Citizen objects that have the top recurring names
         for (Citizen citizen : citizens) {
-            String[] name = citizen.getFullname().split(",");
+            String[] name = citizen.getFullname().split("\\s+");
             if (topNames.contains(name[main_focus_index]) && !topRecurringCitizens.contains(citizen)) {
                 topRecurringCitizens.add(citizen);
             }
