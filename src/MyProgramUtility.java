@@ -113,12 +113,12 @@ public class MyProgramUtility {
         String order = scanner.nextLine();
     return (order.equalsIgnoreCase("a"));
     }
-    public boolean OptionFullname(){
+    public boolean optionFullName(){
         System.out.print("Type F to see top First names\nType L to see top Last names\n\nType Here: ");
         String order = scanner.nextLine();
         return (order.equalsIgnoreCase("f"));
     }
-    public int TopListFullname(){
+    public int topListFullName(){
         System.out.print("\nAssign number of top name list: ");
         return Integer.parseInt(scanner.nextLine());
     }
@@ -154,7 +154,7 @@ public class MyProgramUtility {
                     case 1 -> printData(returnDistrict(listOfCitizens));
                     case 2 -> genderDistribution(citizens);
                     case 3 -> toSort(citizens);
-                    case 4 -> printData(sortingMethods.getTopRecurringNames(citizens,OptionFullname(),TopListFullname()));
+                    case 4 -> printData(sortingMethods.getTopRecurringNames(citizens,optionFullName(),topListFullName()));
                     case 5 -> printData(returnAge(listOfCitizens));
                     case 6 -> specificFinder(citizens,sortingMethods);
                     case 7 -> System.out.println("Exiting program...");
@@ -194,7 +194,7 @@ public class MyProgramUtility {
                         listOfCitizens = returnNameSpecifiedSearch(listOfCitizens);
                         printData(listOfCitizens);
                     }
-                    case 5 -> printData(sortingMethods.getTopRecurringNames(citizens,OptionFullname(),TopListFullname()));
+                    case 5 -> printData(sortingMethods.getTopRecurringNames(citizens,optionFullName(),topListFullName()));
                     case 6 -> System.out.println("Exiting program...");
                     default -> System.out.println("Invalid choice. Please try again.");
                 }
@@ -264,7 +264,7 @@ public class MyProgramUtility {
             if(predicate.test(o)) newCitizen.add(o);
             return o;
         };
-        citizens.stream().map(function).collect(Collectors.toList());
+        citizens.stream().map(function).toList();
         return newCitizen;
     }
 
@@ -277,7 +277,7 @@ public class MyProgramUtility {
             if(predicate.test(o)) newCitizen.add(o);
             return o;
         };
-        citizens.stream().map(function).collect(Collectors.toList());
+        citizens.stream().map(function).toList();
         return newCitizen;
     }
 
