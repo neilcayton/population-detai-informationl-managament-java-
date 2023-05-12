@@ -46,7 +46,6 @@ public class MyProgramUtility {
         return choice;
     }
 
-
     public int readSortingChoice(){
         int choice = 0;
         boolean isValid = false;
@@ -65,8 +64,8 @@ public class MyProgramUtility {
             }
         }
         return choice;
-
     }
+
     public void printSortingMenu(){
         System.out.println("""
                 Sorting options:
@@ -90,9 +89,6 @@ public class MyProgramUtility {
                 5. Show age by choice
                 6. specific finder
                 7. exit""");
-
-
-
     }
 
     public void printSpecificFinderMenu(){
@@ -151,7 +147,6 @@ public class MyProgramUtility {
 
     }
     public void run(){
-        SortingMethods sortingMethods = new SortingMethods();
         int choice = 0;
         try {
             ArrayList<Citizen> citizens = (ArrayList<Citizen>)  readDataFromCSV();
@@ -165,7 +160,7 @@ public class MyProgramUtility {
                     case 3 -> toSort(citizens);
                     case 4 -> topNames(citizens);
                     case 5 -> printData(returnAge(citizens));
-                    case 6 -> specificFinder(citizens,sortingMethods);
+                    case 6 -> specificFinder(citizens);
                     case 7 -> System.out.println("Going back to main menu...");
                     default -> System.out.println("Invalid choice. Please try again.");
                 }
@@ -178,7 +173,7 @@ public class MyProgramUtility {
         }
     }
 
-    public void specificFinder(List<Citizen> citizens, SortingMethods sortingMethods){
+    public void specificFinder(List<Citizen> citizens){
         int choice = 0;
         try {
             List<Citizen> listOfCitizens = citizens;
@@ -190,7 +185,6 @@ public class MyProgramUtility {
                         listOfCitizens = returnDistrict(listOfCitizens);
                         printData(listOfCitizens);
                     }
-
                     case 2 -> {
                         listOfCitizens = returnAge(listOfCitizens);
                         printData(listOfCitizens);
@@ -206,18 +200,15 @@ public class MyProgramUtility {
                     case 5 -> {topNames(listOfCitizens);
                         listOfCitizens = sortingMethods.getTopRecurringNamesOOP(citizens,optionFullName(),topListFullName());
                         }
-                    case 6 -> System.out.println("Exiting program...");
+                    case 6 -> System.out.println("Going back to Main menu...\n");
                     default -> System.out.println("Invalid choice. Please try again.");
                 }
 
             }
-
-
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-
     private void printData(List<Citizen> citizens){
         System.out.println("\n");
         for(Citizen citizen: citizens){
@@ -268,11 +259,13 @@ public class MyProgramUtility {
     }
 
     public void topNames(List<Citizen> citizens){
-        System.out.println("\n TOP NAMES LIST \n");
+
         String[] topNames = sortingMethods.getTopRecurringNames(citizens, optionFullName(), topListFullName());
+        System.out.println("\nTOP NAMES LIST \n");
         for (String top: topNames){
             System.out.println(top);
         }
+        System.out.println("\n");
     }
 
     public List<Citizen> returnAge(List<Citizen> citizens){
@@ -292,23 +285,23 @@ public class MyProgramUtility {
                 .collect(Collectors.toList());
     }
 
-    public List<Citizen> returnNameSpecifiedSearch(List<Citizen> citizens){
+    private List<Citizen> returnNameSpecifiedSearch(List<Citizen> citizens){
         System.out.print("Enter Name: ");
-
         String input = scanner.nextLine();
-
         return citizens.stream()
                 .filter(citizen -> hasDuplicateString(input, citizen.getFullname()))
                 .collect(Collectors.toList());
     }
-    public boolean hasDuplicateString(String input, String str) {
-        String[] nameParts = str.split("\\s+"); // split the name into parts using whitespace
-        for (String part : nameParts) {
-            if (input.equalsIgnoreCase(part)) { // check if the input matches any of the parts
-                return true;
+    private boolean hasDuplicateString(String input, String fullname) {
+        if (fullname.length() < input.length()) {
+            return false; // no need to check if fullname is shorter than input
+        }
+        for (int i = 0; i <= fullname.length() - input.length(); i++) {
+            if (input.equalsIgnoreCase(fullname.substring(i, i + input.length()))) {
+                return true; // found a match
             }
         }
-        return false;
+        return false; // no match found
     }
 
     public List<Citizen> returnResident(List<Citizen> citizens) {

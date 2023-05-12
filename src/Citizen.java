@@ -52,7 +52,7 @@ public class Citizen implements Comparable<Citizen> {
 
     @Override
     public String toString() {
-        return String.format("%-20s%-50s%-50s%-5d%-10b%-5d%-5c",fullname, email ,address ,age , resident , district , gender);
+        return String.format("%-20s%-50s%-50s%-5d%-5d%-5c",fullname, email ,address ,age , district , gender);
     }
 
     @Override
