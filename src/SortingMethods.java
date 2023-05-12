@@ -29,7 +29,46 @@ public class SortingMethods {
         return citizen;
     }
 
-    public List<Citizen> getTopRecurringNames(List<Citizen> citizens, boolean first_last, int numTopNames) {
+    public String[] getTopRecurringNames(List<Citizen> citizens, boolean first_last, int numTopNames) {
+        int main_focus_index = first_last ? 0 : 1;
+
+        Set<String> topRecurringNames = new HashSet<>();
+        Map<String, Integer> nameCountMap = new HashMap<>();
+
+        // Count the occurrences of each name and store them in a HashMap
+        for (Citizen citizen : citizens) {
+            String[] name = citizen.getFullname().split("\\s+");
+            if (name.length <= main_focus_index) {
+                continue; // skip this Citizen object
+            }
+            int count = nameCountMap.getOrDefault(name[main_focus_index], 0);
+            nameCountMap.put(name[main_focus_index], count + 1);
+        }
+
+        // Find the top recurring names
+        TreeMap<Integer, List<String>> sortedNames = new TreeMap<>(Collections.reverseOrder());
+        for (String name : nameCountMap.keySet()) {
+            int count = nameCountMap.get(name);
+            List<String> names = sortedNames.getOrDefault(count, new ArrayList<>());
+            names.add(name);
+            sortedNames.put(count, names);
+        }
+
+        // Add the unique top recurring names to the output set
+        for (int count : sortedNames.keySet()) {
+            List<String> names = sortedNames.get(count);
+            for (String name : names) {
+                if (topRecurringNames.size() >= numTopNames) {
+                    return topRecurringNames.toArray(new String[0]);
+                }
+                topRecurringNames.add(name);
+            }
+        }
+
+        return topRecurringNames.toArray(new String[0]);
+    }
+
+    public List<Citizen> getTopRecurringNamesOOP(List<Citizen> citizens, boolean first_last, int numTopNames) {
         int main_focus_index = first_last ? 0 : 1;
 
         List<Citizen> topRecurringCitizens = new ArrayList<>();
@@ -41,31 +80,32 @@ public class SortingMethods {
             if (name.length <= main_focus_index) {
                 continue; // skip this Citizen object
             }
-            int count;
-            count = nameCountMap.getOrDefault(name[main_focus_index], 0);
+            int count = nameCountMap.getOrDefault(name[main_focus_index], 0);
             nameCountMap.put(name[main_focus_index], count + 1);
         }
 
         // Find the top recurring names
-        PriorityQueue<String> topNames = new PriorityQueue<>((name1, name2) -> {
-            int count1 = nameCountMap.get(name1);
-            int count2 = nameCountMap.get(name2);
-            return count2 - count1;
-        });
+        TreeMap<Integer, List<String>> sortedNames = new TreeMap<>(Collections.reverseOrder());
         for (String name : nameCountMap.keySet()) {
-            if (topNames.size() < numTopNames || nameCountMap.get(name) >= nameCountMap.get(topNames.peek())) {
-                topNames.offer(name);
-                if (topNames.size() > numTopNames) {
-                    topNames.poll();
-                }
-            }
+            int count = nameCountMap.get(name);
+            List<String> names = sortedNames.getOrDefault(count, new ArrayList<>());
+            names.add(name);
+            sortedNames.put(count, names);
         }
 
         // Find the Citizen objects that have the top recurring names
-        for (Citizen citizen : citizens) {
-            String[] name = citizen.getFullname().split("\\s+");
-            if (topNames.contains(name[main_focus_index]) && !topRecurringCitizens.contains(citizen)) {
-                topRecurringCitizens.add(citizen);
+        for (int count : sortedNames.keySet()) {
+            List<String> names = sortedNames.get(count);
+            for (String name : names) {
+                if (topRecurringCitizens.size() >= numTopNames) {
+                    return topRecurringCitizens;
+                }
+                for (Citizen citizen : citizens) {
+                    String[] fullName = citizen.getFullname().split("\\s+");
+                    if (fullName.length > main_focus_index && fullName[main_focus_index].equals(name)) {
+                        topRecurringCitizens.add(citizen);
+                    }
+                }
             }
         }
 

@@ -9,12 +9,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class MyProgramUtility {
-    private List<Citizen> listOfCitizens;
+    public SortingMethods sortingMethods = new SortingMethods();
     Scanner scanner = new Scanner(System.in);
     public static void main(String[] args) {
         MyProgramUtility newDat = new MyProgramUtility();
@@ -164,7 +163,7 @@ public class MyProgramUtility {
                     case 1 -> printData(returnDistrict(citizens));
                     case 2 -> genderDistribution(citizens);
                     case 3 -> toSort(citizens);
-                    case 4 -> printData(sortingMethods.getTopRecurringNames(citizens,optionFullName(),topListFullName()));
+                    case 4 -> topNames(citizens);
                     case 5 -> printData(returnAge(citizens));
                     case 6 -> specificFinder(citizens,sortingMethods);
                     case 7 -> System.out.println("Going back to main menu...");
@@ -182,7 +181,7 @@ public class MyProgramUtility {
     public void specificFinder(List<Citizen> citizens, SortingMethods sortingMethods){
         int choice = 0;
         try {
-            listOfCitizens = citizens;
+            List<Citizen> listOfCitizens = citizens;
             while (choice!=6){
                 printSpecificFinderMenu();
                 choice = readChoice();
@@ -204,7 +203,9 @@ public class MyProgramUtility {
                         listOfCitizens = returnNameSpecifiedSearch(listOfCitizens);
                         printData(listOfCitizens);
                     }
-                    case 5 -> printData(sortingMethods.getTopRecurringNames(citizens,optionFullName(),topListFullName()));
+                    case 5 -> {topNames(listOfCitizens);
+                        listOfCitizens = sortingMethods.getTopRecurringNamesOOP(citizens,optionFullName(),topListFullName());
+                        }
                     case 6 -> System.out.println("Exiting program...");
                     default -> System.out.println("Invalid choice. Please try again.");
                 }
@@ -218,10 +219,11 @@ public class MyProgramUtility {
     }
 
     private void printData(List<Citizen> citizens){
+        System.out.println("\n");
         for(Citizen citizen: citizens){
             System.out.println(citizen.toString());
         }
-
+        System.out.println("\n");
     }
     public File readFile(String fileName){
         URL url = getClass().getResource(fileName);
@@ -265,30 +267,29 @@ public class MyProgramUtility {
     return citizensList;
     }
 
+    public void topNames(List<Citizen> citizens){
+        System.out.println("\n TOP NAMES LIST \n");
+        String[] topNames = sortingMethods.getTopRecurringNames(citizens, optionFullName(), topListFullName());
+        for (String top: topNames){
+            System.out.println(top);
+        }
+    }
+
     public List<Citizen> returnAge(List<Citizen> citizens){
-        List<Citizen> newCitizen = new ArrayList<>();
         System.out.print("Age that you want to see: ");
         int age = scanner.nextInt();
-        Predicate<Citizen> predicate = citizen -> citizen.age == age;
-        Function<Citizen, Citizen> function= o -> {
-            if(predicate.test(o)) newCitizen.add(o);
-            return o;
-        };
-        citizens.stream().map(function).toList();
-        return newCitizen;
+        return citizens.stream()
+                .filter(citizen -> citizen.age == age)
+                .collect(Collectors.toList());
     }
 
     public List<Citizen> returnDistrict(List<Citizen> citizens){
-        List<Citizen> newCitizen = new ArrayList<>();
         System.out.print("District that you want to see: ");
         int dist = scanner.nextInt();
-        Predicate<Citizen> predicate = citizen -> citizen.district == dist;
-        Function<Citizen, Citizen> function= o -> {
-            if(predicate.test(o)) newCitizen.add(o);
-            return o;
-        };
-        citizens.stream().map(function).toList();
-        return newCitizen;
+        scanner.nextLine(); // consume the remaining newline character
+        return citizens.stream()
+                .filter(citizen -> citizen.district == dist)
+                .collect(Collectors.toList());
     }
 
     public List<Citizen> returnNameSpecifiedSearch(List<Citizen> citizens){
@@ -310,30 +311,21 @@ public class MyProgramUtility {
         return false;
     }
 
-    public List<Citizen> returnResident(List<Citizen> citizens){
-        boolean condition;
-        boolean isValid = true;
+    public List<Citizen> returnResident(List<Citizen> citizens) {
         String input;
-        do {
-            System.out.print("Enter  [N(Non-resident)/R(Resident)]: ");
+        while (true) {
+            System.out.print("Enter [N (Non-resident) / R (Resident)]: ");
             input = scanner.nextLine().toLowerCase();
-            if (input.equals("n") || input.equals("y")) {
-                if(input.equals("n")){
-                    condition = false;
-                }
-                {
-                    condition = true;
-                }
-                isValid = false;
+            if (input.equals("n") || input.equals("r")) {
+                final boolean condition = input.equals("r"); // define a new final variable
+                // use the condition to filter the citizens list
+                return citizens.stream()
+                        .filter(citizen -> citizen.resident == condition)
+                        .collect(Collectors.toList());
             } else {
-                System.out.println("Invalid input. Please enter either 'N' or 'Y'.");
+                System.out.println("Invalid input. Please enter either 'N' or 'R'.");
             }
-        } while (isValid);
-
-
-        boolean finalCondition = true;
-        return citizens.stream()
-                .filter(citizen -> finalCondition == citizen.resident).collect(Collectors.toList());
+        }
     }
     public List<Citizen> returnGender(List<Citizen> citizens){
 
